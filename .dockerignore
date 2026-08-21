@@ -1,0 +1,29 @@
+# Virtual environment
+venv/
+.venv/
+env/
+ENV/
+
+# Local database storage
+qdrant_storage/
+backend/qdrant_storage/
+
+# Environment configurations and keys (Do not bake secrets into images!)
+.env
+serviceAccountKey.json
+
+# Cache directories
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+
+# Git
+.git
+.gitignore
+
+# Application Logs
+*.log
+streamlit.log
