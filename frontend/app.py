@@ -228,7 +228,8 @@ st.caption("Multi-format Document Ingestion · Qdrant Vector Storage · BGE Cros
 # System Health Check
 def check_health():
     try:
-        r = requests.get(f"{st.session_state.api_url}/api/health", timeout=3)
+        # Increased timeout to 15 seconds to give Render's spin-up time a chance
+        r = requests.get(f"{st.session_state.api_url}/api/health", timeout=15)
         if r.status_code == 200:
             return True, r.json()
     except Exception:
@@ -255,6 +256,10 @@ with col_status4:
     st.markdown(f"<div class='metric-card'><div class='metric-label'>Firebase Storage</div><div class='metric-value orange'>{firebase_status}</div></div>", unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
+
+# Render Cold Start Notice
+if not is_healthy:
+    st.info(f"ℹ️ **Render Free Tier Notice**: Your backend on Render may be sleeping due to inactivity. It can take **50–90 seconds** to wake up. Click this link to open the backend directly and wake it up: [{st.session_state.api_url}/api/health]({st.session_state.api_url}/api/health), then refresh this Streamlit page once the backend responds.")
 
 # Main Navigation Tabs
 tab_query, tab_admin = st.tabs(["💬 Query & Chat", "🛡️ Admin Panel"])
