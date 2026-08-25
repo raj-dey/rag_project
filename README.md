@@ -16,6 +16,11 @@ End-to-End Retrieval-Augmented Generation (RAG) system with a FastAPI backend, Q
 
 ---
 
+Demo 🚀
+👉  https://ragproject-raj-dey.streamlit.app
+
+---
+
 ## ⚡ Quick Start
 
 ### 1. Set Up Virtual Environment
