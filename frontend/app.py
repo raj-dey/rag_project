@@ -285,11 +285,6 @@ st.markdown("<br>", unsafe_allow_html=True)
 # Render Cold Start Notice
 if not is_healthy:
     st.info(f"ℹ️ **Render Free Tier Notice**: Your backend on Render may be sleeping due to inactivity. It can take **50–90 seconds** to wake up. Click this link to open the backend directly and wake it up: [{st.session_state.api_url}/api/health]({st.session_state.api_url}/api/health), then refresh this Streamlit page once the backend responds.")
-    if "error" in health_data:
-        st.error(f"❌ **Backend Error Details:**\n\n`{health_data['error']}`")
-        if "traceback" in health_data:
-            with st.expander("🛠️ View Full Stack Trace"):
-                st.code(health_data["traceback"])
 
 # Main Navigation Tabs
 tab_query, tab_admin = st.tabs(["💬 Query & Chat", "🛡️ Admin Panel"])

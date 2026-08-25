@@ -59,26 +59,18 @@ async def root():
 
 @app.get("/api/health", tags=["Health Check"])
 async def health_check():
-    try:
-        from backend.core.firebase_client import is_firebase_enabled
-        embed_service = EmbeddingService()
-        qdrant_store = QdrantVectorStore(vector_size=embed_service.vector_dimension)
-        stats = qdrant_store.get_stats()
-        
-        return {
-            "status": "healthy",
-            "vector_store": stats,
-            "embedding_provider": embed_service.provider,
-            "reranker_model": settings.RERANKER_MODEL_NAME,
-            "firebase_enabled": is_firebase_enabled()
-        }
-    except Exception as e:
-        import traceback
-        return {
-            "status": "unhealthy",
-            "error": str(e),
-            "traceback": traceback.format_exc()
-        }
+    from backend.core.firebase_client import is_firebase_enabled
+    embed_service = EmbeddingService()
+    qdrant_store = QdrantVectorStore(vector_size=embed_service.vector_dimension)
+    stats = qdrant_store.get_stats()
+    
+    return {
+        "status": "healthy",
+        "vector_store": stats,
+        "embedding_provider": embed_service.provider,
+        "reranker_model": settings.RERANKER_MODEL_NAME,
+        "firebase_enabled": is_firebase_enabled()
+    }
 
 @app.get("/api/debug/chunks")
 async def debug_chunks(filename: str = None):

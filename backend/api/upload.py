@@ -250,10 +250,7 @@ async def upload_documents(
             chunk_texts = [c["text"] for c in all_chunks]
             embeddings = embedding_service.embed_documents(chunk_texts)
         except Exception as err:
-            raise HTTPException(
-                status_code=500, 
-                detail=f"Failed to generate embeddings. Original Error: {str(e)} | Fallback Error: {str(err)}"
-            )
+            raise HTTPException(status_code=500, detail=f"Failed to generate embeddings: {str(err)}")
 
     # --- Upsert to Qdrant ---
     try:
