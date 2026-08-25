@@ -2,6 +2,14 @@ import os
 from typing import Optional
 from pydantic_settings import BaseSettings
 
+# Detect if local model packages are installed (sentence-transformers & torch)
+try:
+    import sentence_transformers
+    import torch
+    has_local_models = True
+except ImportError:
+    has_local_models = False
+
 class Settings(BaseSettings):
     # App General Settings
     APP_NAME: str = "Production RAG Backend"
@@ -17,13 +25,13 @@ class Settings(BaseSettings):
     QDRANT_COLLECTION_NAME: str = "rag_documents"
 
     # Embeddings Settings
-    EMBEDDING_PROVIDER: str = "huggingface"  # "huggingface" or "gemini"
+    EMBEDDING_PROVIDER: str = "huggingface" if has_local_models else "gemini"  # "huggingface" or "gemini"
     HF_EMBEDDING_MODEL: str = "BAAI/bge-small-en-v1.5"  # 384 dim, fast & high quality
     GEMINI_EMBEDDING_MODEL: str = "gemini-embedding-001"  # 3072 dim
 
     # Reranker Settings
     RERANKER_MODEL_NAME: str = "BAAI/bge-reranker-base"
-    ENABLE_RERANKER: bool = True
+    ENABLE_RERANKER: bool = True if has_local_models else False
 
     # LLM Settings (Gemini)
     GEMINI_API_KEY: Optional[str] = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
