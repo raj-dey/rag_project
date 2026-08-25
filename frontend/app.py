@@ -175,8 +175,20 @@ st.markdown("""
 # Application State Initialization
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
-default_api_url = os.getenv("https://rag-project-l0gm.onrender.com") or os.getenv("API_URL") or "http://localhost:8000"
-if "api_url" not in st.session_state:
+# Resolve the Backend URL from Secrets or Env Variables
+backend_url_secret = None
+try:
+    if "BACKEND_URL" in st.secrets:
+        backend_url_secret = st.secrets["BACKEND_URL"]
+    elif "API_URL" in st.secrets:
+        backend_url_secret = st.secrets["API_URL"]
+except Exception:
+    pass
+
+default_api_url = backend_url_secret or os.getenv("BACKEND_URL") or os.getenv("API_URL") or "http://localhost:8000"
+
+# Set or override cached localhost:8000 if we have a valid cloud URL
+if "api_url" not in st.session_state or (st.session_state.api_url == "http://localhost:8000" and default_api_url != "http://localhost:8000"):
     st.session_state.api_url = default_api_url
 if "admin_authenticated" not in st.session_state:
     st.session_state.admin_authenticated = False
