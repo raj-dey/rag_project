@@ -51,12 +51,19 @@ class EmbeddingService:
         if self.provider in ["gemini", "google"] and self.gemini_api_key:
             try:
                 client = genai.Client(api_key=self.gemini_api_key)
-                response = client.models.embed_content(
-                    model=self.gemini_model_name,
-                    contents=texts
-                )
-                embeddings = [e.values for e in response.embeddings]
-                return embeddings
+                
+                # Batch requests in chunks of 90 to respect the 100-request limit
+                batch_size = 90
+                all_embeddings = []
+                for i in range(0, len(texts), batch_size):
+                    batch_texts = texts[i:i + batch_size]
+                    response = client.models.embed_content(
+                        model=self.gemini_model_name,
+                        contents=batch_texts
+                    )
+                    embeddings = [e.values for e in response.embeddings]
+                    all_embeddings.extend(embeddings)
+                return all_embeddings
             except Exception as e:
                 print(f"[EmbeddingService] Gemini Embedding failed: {e}. Falling back to HuggingFace BGE.")
                 try:
