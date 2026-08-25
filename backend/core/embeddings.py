@@ -53,16 +53,36 @@ class EmbeddingService:
                 client = genai.Client(api_key=self.gemini_api_key)
                 
                 # Batch requests in chunks of 90 to respect the 100-request limit
+                import time
                 batch_size = 90
                 all_embeddings = []
                 for i in range(0, len(texts), batch_size):
                     batch_texts = texts[i:i + batch_size]
-                    response = client.models.embed_content(
-                        model=self.gemini_model_name,
-                        contents=batch_texts
-                    )
-                    embeddings = [e.values for e in response.embeddings]
-                    all_embeddings.extend(embeddings)
+                    
+                    # Retry logic for 429 rate limit exceptions
+                    max_retries = 5
+                    retry_delay = 5
+                    for attempt in range(max_retries):
+                        try:
+                            response = client.models.embed_content(
+                                model=self.gemini_model_name,
+                                contents=batch_texts
+                            )
+                            embeddings = [e.values for e in response.embeddings]
+                            all_embeddings.extend(embeddings)
+                            break  # Success, exit the retry loop
+                        except Exception as err:
+                            # Catch rate limit (429) or quota errors
+                            if "429" in str(err) or "quota" in str(err).lower():
+                                if attempt < max_retries - 1:
+                                    print(f"[EmbeddingService] Rate limit (429) hit. Retrying in {retry_delay}s... (Attempt {attempt+1}/{max_retries})")
+                                    time.sleep(retry_delay)
+                                    retry_delay *= 2  # Exponential backoff
+                                    continue
+                            raise err
+                    
+                    # Pacing delay between batches to respect rate limits
+                    time.sleep(1)
                 return all_embeddings
             except Exception as e:
                 print(f"[EmbeddingService] Gemini Embedding failed: {e}. Falling back to HuggingFace BGE.")
