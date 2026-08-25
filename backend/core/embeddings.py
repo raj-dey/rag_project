@@ -15,6 +15,13 @@ class EmbeddingService:
         self.gemini_model_name = settings.GEMINI_EMBEDDING_MODEL.replace("models/", "")
         
         if self.provider == "huggingface":
+            try:
+                from sentence_transformers import SentenceTransformer
+            except ImportError:
+                print("[EmbeddingService] sentence-transformers package not found. Auto-fallback to 'gemini'.")
+                self.provider = "gemini"
+        
+        if self.provider == "huggingface":
             self._load_hf_model()
 
     @property
