@@ -13,12 +13,19 @@ def get_shared_qdrant_client():
             print("[QdrantVectorStore] Initializing Qdrant in MEMORY mode")
             _global_client = RawQdrantClient(":memory:")
         elif settings.QDRANT_MODE == "server":
-            print(f"[QdrantVectorStore] Initializing Qdrant SERVER mode ({settings.QDRANT_HOST}:{settings.QDRANT_PORT})")
-            _global_client = RawQdrantClient(
-                host=settings.QDRANT_HOST,
-                port=settings.QDRANT_PORT,
-                api_key=settings.QDRANT_API_KEY
-            )
+            if settings.QDRANT_HOST.startswith("http://") or settings.QDRANT_HOST.startswith("https://"):
+                print(f"[QdrantVectorStore] Initializing Qdrant SERVER mode using URL ({settings.QDRANT_HOST})")
+                _global_client = RawQdrantClient(
+                    url=settings.QDRANT_HOST,
+                    api_key=settings.QDRANT_API_KEY
+                )
+            else:
+                print(f"[QdrantVectorStore] Initializing Qdrant SERVER mode ({settings.QDRANT_HOST}:{settings.QDRANT_PORT})")
+                _global_client = RawQdrantClient(
+                    host=settings.QDRANT_HOST,
+                    port=settings.QDRANT_PORT,
+                    api_key=settings.QDRANT_API_KEY
+                )
         else:  # "disk"
             storage_path = os.path.abspath(settings.QDRANT_PATH)
             os.makedirs(storage_path, exist_ok=True)
