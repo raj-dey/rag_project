@@ -212,11 +212,15 @@ with st.sidebar:
         help="If provided, uses Google Gemini (gemini-3.6-flash) & gemini-embedding-001. If omitted, uses local BGE embeddings and fallback synthesizer."
     )
     
+    # Auto-detect default provider based on whether we are connecting to a remote cloud backend
+    default_provider = "gemini" if "localhost" not in st.session_state.api_url else "huggingface"
+    provider_options = ["gemini", "huggingface"] if default_provider == "gemini" else ["huggingface", "gemini"]
+
     embedding_provider = st.selectbox(
         "Embedding Model",
-        options=["huggingface", "gemini"],
+        options=provider_options,
         index=0,
-        help="huggingface = BAAI/bge-small-en-v1.5 (Local/Free), gemini = gemini-embedding-001 (Google)"
+        help="gemini = gemini-embedding-001 (Google API), huggingface = BAAI/bge-small-en-v1.5 (Local Model)"
     )
 
     st.markdown("---")
