@@ -80,16 +80,6 @@ async def health_check():
             "traceback": traceback.format_exc()
         }
 
-@app.get("/api/debug/settings")
-async def debug_settings():
-    return {
-        "embedding_provider": settings.EMBEDDING_PROVIDER,
-        "enable_reranker": settings.ENABLE_RERANKER,
-        "qdrant_mode": settings.QDRANT_MODE,
-        "firebase_enabled": settings.FIREBASE_ENABLED,
-        "has_gemini_key": bool(settings.GEMINI_API_KEY)
-    }
-
 @app.get("/api/debug/chunks")
 async def debug_chunks(filename: str = None):
     embed_service = EmbeddingService()
