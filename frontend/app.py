@@ -245,14 +245,19 @@ def check_health():
         if r.status_code == 200:
             data = r.json()
             if data.get("status") == "healthy":
+                st.session_state.firebase_enabled = data.get("firebase_enabled", False)
                 return True, data
             else:
+                st.session_state.firebase_enabled = False
                 return False, data
     except Exception as e:
+        st.session_state.firebase_enabled = False
         return False, {"error": str(e)}
+    st.session_state.firebase_enabled = False
     return False, {}
 
 is_healthy, health_data = check_health()
+firebase_enabled = st.session_state.get("firebase_enabled", False)
 
 col_status1, col_status2, col_status3, col_status4 = st.columns(4)
 with col_status1:
@@ -268,7 +273,7 @@ with col_status3:
     st.markdown(f"<div class='metric-card'><div class='metric-label'>Indexed Documents</div><div class='metric-value green'>{unique_files}</div></div>", unsafe_allow_html=True)
 
 with col_status4:
-    firebase_status = "Active" if settings.FIREBASE_ENABLED else "⚪ Disabled"
+    firebase_status = "Active" if firebase_enabled else "⚪ Disabled"
     st.markdown(f"<div class='metric-card'><div class='metric-label'>Firebase Storage</div><div class='metric-value orange'>{firebase_status}</div></div>", unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
@@ -451,7 +456,7 @@ with tab_admin:
     col_admin_title, col_logout = st.columns([4, 1])
     with col_admin_title:
         st.markdown("### 📂 Document Management")
-        if settings.FIREBASE_ENABLED:
+        if firebase_enabled:
             st.caption("🔥 Firebase Active — Showing files from Firestore + Firebase Storage. Deletion cascades to Qdrant + Firestore + Storage.")
         else:
             st.caption("⚪ Firebase disabled — Showing files from Qdrant only. Deletion removes vector chunks only.")
@@ -467,7 +472,7 @@ with tab_admin:
     # --- Document Ingestion & Upload (Integrated) ---
     st.markdown("---")
     st.markdown("#### 📁 Upload & Index New Documents")
-    if settings.FIREBASE_ENABLED:
+    if firebase_enabled:
         st.info("🔥 **Firebase Active** — Files will be stored in Firebase Storage + metadata tracked in Firestore + synonyms extracted automatically.")
     else:
         st.warning("⚪ Firebase is disabled. Files will be indexed into Qdrant only (no persistent file storage). Enable in `.env` to activate Firebase.")
