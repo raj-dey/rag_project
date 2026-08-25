@@ -1,6 +1,5 @@
 from typing import List
 import os
-from sentence_transformers import SentenceTransformer
 from google import genai
 from backend.core.config import settings
 
@@ -24,6 +23,7 @@ class EmbeddingService:
 
     def _load_hf_model(self):
         if self.hf_model_name not in _global_hf_models:
+            from sentence_transformers import SentenceTransformer
             print(f"[EmbeddingService] Loading HuggingFace model: {self.hf_model_name}")
             _global_hf_models[self.hf_model_name] = SentenceTransformer(self.hf_model_name)
 

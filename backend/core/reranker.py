@@ -1,6 +1,5 @@
 import math
 from typing import List, Dict, Any
-from sentence_transformers import CrossEncoder
 from backend.core.config import settings
 
 _global_reranker_models = {}
@@ -17,6 +16,7 @@ class BGEReranker:
 
     def _load_model(self):
         if self.model_name not in _global_reranker_models:
+            from sentence_transformers import CrossEncoder
             print(f"[BGEReranker] Loading Cross-Encoder model: {self.model_name}")
             try:
                 _global_reranker_models[self.model_name] = CrossEncoder(self.model_name, max_length=512)

@@ -175,8 +175,9 @@ st.markdown("""
 # Application State Initialization
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
+default_api_url = os.getenv("https://rag-project-l0gm.onrender.com") or os.getenv("API_URL") or "http://localhost:8000"
 if "api_url" not in st.session_state:
-    st.session_state.api_url = "http://localhost:8000"
+    st.session_state.api_url = default_api_url
 if "admin_authenticated" not in st.session_state:
     st.session_state.admin_authenticated = False
 if "confirm_delete_all" not in st.session_state:

@@ -203,16 +203,27 @@ async def process_query(
     # Rerank using the ORIGINAL query (not expanded) for precision
     # ------------------------------------------------------------------
     t_rerank_start = time.time()
-    reranker = BGEReranker()
-    reranked_chunks = reranker.rerank(
-        query=request.query,
-        chunks=candidate_chunks,
-        top_n=request.top_n,
-        score_threshold=request.score_threshold
-    )
+    if settings.ENABLE_RERANKER:
+        reranker = BGEReranker()
+        reranked_chunks = reranker.rerank(
+            query=request.query,
+            chunks=candidate_chunks,
+            top_n=request.top_n,
+            score_threshold=request.score_threshold
+        )
+    else:
+        # Reranking is disabled, use raw vector scores and format
+        reranked_chunks = []
+        for c in candidate_chunks:
+            c["rerank_score"] = round(float(c.get("score", 0.0)), 4)
+            c["raw_logit"] = 0.0
+            c["vector_score"] = round(float(c.get("score", 0.0)), 4)
+            reranked_chunks.append(c)
+        reranked_chunks = reranked_chunks[:request.top_n]
+
     rerank_ms = round((time.time() - t_rerank_start) * 1000, 2)
 
-    logger.info(f"[Query] After reranking: {len(reranked_chunks)} chunks retained (top_n={request.top_n})")
+    logger.info(f"[Query] After reranking (enabled={settings.ENABLE_RERANKER}): {len(reranked_chunks)} chunks retained (top_n={request.top_n})")
 
     # ------------------------------------------------------------------
     # Step 4: LLM Answer Generation
