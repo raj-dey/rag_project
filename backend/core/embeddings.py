@@ -59,7 +59,11 @@ class EmbeddingService:
                 return embeddings
             except Exception as e:
                 print(f"[EmbeddingService] Gemini Embedding failed: {e}. Falling back to HuggingFace BGE.")
-                self.provider = "huggingface"
+                try:
+                    from sentence_transformers import SentenceTransformer
+                    self.provider = "huggingface"
+                except ImportError:
+                    raise Exception(f"Gemini embedding failed: {str(e)} (HuggingFace fallback unavailable)")
 
         self._load_hf_model()
         embeddings = self._hf_model.encode(texts, show_progress_bar=False, normalize_embeddings=True)
@@ -76,7 +80,11 @@ class EmbeddingService:
                 return response.embeddings[0].values
             except Exception as e:
                 print(f"[EmbeddingService] Gemini Query Embedding failed: {e}. Falling back to HuggingFace BGE.")
-                self.provider = "huggingface"
+                try:
+                    from sentence_transformers import SentenceTransformer
+                    self.provider = "huggingface"
+                except ImportError:
+                    raise Exception(f"Gemini query embedding failed: {str(e)} (HuggingFace fallback unavailable)")
 
         self._load_hf_model()
         
