@@ -103,23 +103,6 @@ streamlit run frontend/app.py
 
 ---
 
-## ⚙️ Configuration
-
-Key environment variables in `.env` (see `.env.example` for all options):
-
-| Variable | Default | Description |
-| :--- | :--- | :--- |
-| `GEMINI_API_KEY` | *None* | Google Gemini API key for LLM and embeddings |
-| `ADMIN_PASSWORD` | `admin123` | Password to unlock Admin Panel tab in Streamlit |
-| `EMBEDDING_PROVIDER` | `huggingface` | `huggingface` (local BGE) or `gemini` (cloud 3072-dim) |
-| `QDRANT_MODE` | `disk` | Vector database mode: `disk`, `memory`, or `server` |
-| `QDRANT_PATH` | `./qdrant_storage` | Local directory for on-disk vector storage |
-| `ENABLE_RERANKER` | `false` | Enable/disable BGE cross-encoder reranking stage |
-| `OLLAMA_URL` | `http://localhost:11434`| Endpoint for local Ollama fallback |
-| `FIREBASE_ENABLED` | `false` | Enable Firebase Firestore & Cloud Storage sync |
-
----
-
 ## 📡 API Endpoints
 
 Interactive Swagger docs available at `/docs`.
